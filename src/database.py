@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from src.models import Player
+from src.models import Player, Rank
 
 players: dict[int, Player] = {}
 roles = {
@@ -13,3 +13,4 @@ roles = {
 }
 
 session_channel = None
+session_messages = {rank: None for rank in Rank.list()}

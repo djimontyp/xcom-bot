@@ -1,5 +1,4 @@
 # Discord привилегии.
-import typing
 
 import discord
 from discord.ext.commands import Bot
@@ -8,8 +7,6 @@ from src.cogs.admin import AdminCog
 from src.cogs.player import PlayerCog
 from src.config import settings
 
-if typing.TYPE_CHECKING:
-    pass
 
 intents = discord.Intents.all()
 intents.members = True  # noqa
