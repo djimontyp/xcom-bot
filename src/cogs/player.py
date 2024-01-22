@@ -1,105 +1,18 @@
 import random
 
 import discord
-from discord import Cog, ApplicationContext, SlashCommandGroup, Interaction
+from discord import Cog, ApplicationContext, SlashCommandGroup
 from discord.ext import commands
 from discord.ext.commands import Bot, cooldown
-from discord.ui import Item
 
-from src import texts, database
+from src import database
 from src.checks import is_user_in_db
 from src.config import settings
 from src.errors.player import NotSetRolesError, PlayerNotCreatedError, PlayerNotInSearchError, PlayerSelfInviteError
-from src.models import Player, Map, GameResult
+from src.models import Player, Map, Rank
 from src.services.roles import RolesService
-
-
-class Confirm(discord.ui.View):
-    def __init__(self, initiator: int, invited: int):
-        super().__init__()
-        self.value = None
-        self.initiator = initiator
-        self.invited = invited
-
-    @discord.ui.button(label="Подтвердить", style=discord.ButtonStyle.green)
-    async def confirm_callback(self, button: discord.ui.Button, interaction: Interaction):
-        self.disable_all_items()
-        await interaction.response.send_message("Подтверждено", ephemeral=True)
-        self.value = True
-        self.stop()
-
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
-    async def cancel_callback(self, button: discord.ui.Button, interaction: Interaction):
-        self.disable_all_items()
-        await interaction.response.send_message("Отменено", ephemeral=True)
-        self.value = False
-        self.stop()
-
-    async def on_timeout(self) -> None:
-        self.disable_all_items()
-
-
-class ResultsButtons(discord.ui.View):
-    def __init__(self, initiator: int, invited: int):
-        super().__init__()
-        self.initiator = initiator
-        self.invited = invited
-
-        self.result: dict[int, GameResult | None] = {
-            initiator: None,
-            invited: None,
-        }
-
-    @discord.ui.button(label="Победа", style=discord.ButtonStyle.green, custom_id="win_callback")
-    async def win_callback(self, button: discord.ui.Button, interaction: Interaction):
-        await interaction.response.defer()
-        self.result[interaction.user.id] = GameResult.win
-        await self.update_buttons_labels(interaction)
-
-    @discord.ui.button(label="Поражение", style=discord.ButtonStyle.red, custom_id="lose_callback")
-    async def lose_callback(self, button: discord.ui.Button, interaction: Interaction):
-        await interaction.response.defer()
-        self.result[interaction.user.id] = GameResult.lose
-        await self.update_buttons_labels(interaction)
-
-    @discord.ui.button(label="Ничья", style=discord.ButtonStyle.grey, custom_id="draw_callback")
-    async def draw_callback(self, button: discord.ui.Button, interaction: Interaction):
-        await interaction.response.defer()
-        self.result[interaction.user.id] = GameResult.draw
-        await self.update_buttons_labels(interaction)
-
-    async def update_buttons_labels(self, interaction: Interaction):
-        initiator, invited = database.players[self.initiator], database.players[self.invited]
-        initiator_result, invited_result = self.result[self.initiator], self.result[self.invited]
-
-        if initiator_result and invited_result:
-            match initiator_result, invited_result:
-                case GameResult.win, GameResult.lose:
-                    initiator.rating += 10
-                    invited.rating -= 10
-                case GameResult.lose, GameResult.win:
-                    initiator.rating -= 10
-                    invited.rating += 10
-                case GameResult.draw:
-                    ...
-                case _:
-                    raise ValueError(f"Парадоксальная комбинация: {initiator_result}, {invited_result}")
-            await interaction.response.edit_message(
-                content=f"Результаты сессии: {initiator_result} vs {invited_result}",
-                view=None,
-            )
-        await interaction.channel.send(
-            f"Обновлены результаты сессии: {initiator.mention}{initiator_result} vs {invited.mention} [{invited_result}]",
-        )
-
-    async def interaction_check(self, interaction: Interaction):
-        if interaction.user.id not in self.result:
-            raise discord.errors.CheckFailure()
-        return True
-
-    async def on_error(self, error: Exception, item: Item, interaction: Interaction) -> None:
-        if isinstance(error, discord.errors.CheckFailure):
-            await interaction.response.send_message("Вы не участвуете в сессии.", ephemeral=True)
+from src.views.confirm import Confirm
+from src.views.game_result import ResultsButtons
 
 
 class PlayerCog(Cog, guild_ids=[settings.GUILD_ID]):
@@ -120,7 +33,7 @@ class PlayerCog(Cog, guild_ids=[settings.GUILD_ID]):
         # С чем будем работать
         roles_service = RolesService()
         player = Player(id=ctx.user.id)
-        if not (neofit := roles_service.get_role(ctx, "neofit")):
+        if not (neofit := roles_service.get_role(ctx, Rank.neofit)):
             await ctx.respond("Неофит роль не установлена. Обратитесь к администратору.")
             return
 
@@ -187,12 +100,12 @@ class PlayerCog(Cog, guild_ids=[settings.GUILD_ID]):
                     voice_title = "{} vs {}".format(ctx.user.display_name, player.display_name)
                     voice = await category.create_voice_channel(name=voice_title, overwrites=overwrites)
 
-                    buttons = ResultsButtons(initiator=ctx.user.id, invited=player.id)
+                    buttons = ResultsButtons(initiator_id=ctx.user.id, invited_id=player.id)
                     await voice.send(view=buttons)
 
                     database.players[ctx.user.id].in_search, database.players[player.id].in_search = False, False
 
-                    map_ = random.choice(Map.list())
+                    map_ = random.choice(list(Map))
                     await player.send(f"Приглашение в сессию от {ctx.user.mention}. Карта: {map_}.\n{voice.jump_url}")
                     await ctx.user.send(f"Приглашение в сессию для {player.mention}. Карта: {map_}.\n{voice.jump_url}")
             elif view.value is None:
@@ -247,7 +160,7 @@ class PlayerCog(Cog, guild_ids=[settings.GUILD_ID]):
         else:
             print(error)
             await ctx.respond(
-                f"Модуль игроков: {texts.errors['unknown']}",
+                f"Модуль игроков: Произошла неизвестная ошибка.",
                 ephemeral=True,
                 delete_after=settings.DELETE_AFTER,
             )

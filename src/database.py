@@ -2,18 +2,19 @@ from src.models import Player, Rank
 
 players: dict[int, Player] = {
     412350766662156289: Player(id=412350766662156289, in_search=True, rating=100),
+    1128775596781088798: Player(id=1128775596781088798, in_search=True, rating=100),
 }
 roles = {
     Rank.neofit: 1195819868247830580,
     Rank.adept: 1195819965304012833,
     Rank.master: 1195820003514134579,
-    Rank.archon: None,
-    Rank.ethereal: None,
-    Rank.officer: None,
+    # Rank.archon: None,
+    # Rank.ethereal: None,
+    # Rank.officer: None,
 }
 
 session_channel = 1196106456974504096
-session_messages = {rank: None for rank in Rank.list()}
+session_messages = {rank: None for rank in list(Rank)}
 
 # from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 # from sqlalchemy.orm import sessionmaker, declarative_base

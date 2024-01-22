@@ -5,14 +5,13 @@ from discord import (
     SlashCommandGroup,
     Role,
     TextChannel,
-    Option,
 )
 from discord.ext import tasks
 from discord.ext.commands import Bot
 
 from src import database
 from src.config import settings
-from src.options import ranks_options, RanksAutocomplete
+from src.options import RanksAutocomplete
 from src.services.roles import RolesService
 
 

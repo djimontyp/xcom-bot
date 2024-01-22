@@ -58,10 +58,6 @@ class Rank(StrEnum):
         ranks = list(cls)
         return ranks.index(rank1) - ranks.index(rank2)
 
-    @classmethod
-    def list(cls):
-        return list(map(lambda c: c.value, cls))
-
 
 class Map(StrEnum):
     abductor = "Abductor"
@@ -73,16 +69,8 @@ class Map(StrEnum):
     exalt_hq = "Exalt HQ"
     exalt_prison = "Exalt Prison"
 
-    @classmethod
-    def list(cls):
-        return list(map(lambda c: c.value, cls))
-
 
 class GameResult(StrEnum):
     win = "Победа"
     lose = "Поражение"
     draw = "Ничья"
-
-    @classmethod
-    def list(cls):
-        return list(map(lambda c: c.value, cls))

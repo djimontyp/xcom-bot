@@ -3,7 +3,7 @@ from src.config import settings
 from src.models import Rank
 
 
-class Rating:
+class RatingService:
     def __init__(self, winner_id: int, loser_id: int, /):
         self.winner = database.players[winner_id]
         self.loser = database.players[loser_id]
