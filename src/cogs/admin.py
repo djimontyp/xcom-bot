@@ -25,13 +25,25 @@ class AdminCog(Cog, guild_ids=[settings.GUILD_ID]):
     admin = SlashCommandGroup("admin", "Группа команд для администраторов.")
 
     @admin.command(description="Установить роли соответствия для рангов.")
-    async def set_roles(self, ctx: ApplicationContext, neofit: Role | None, adept: Role | None, master: Role | None):
+    async def set_roles(
+        self,
+        ctx: ApplicationContext,
+        neofit: Role | None,
+        adept: Role | None,
+        master: Role | None,
+        archon: Role | None,
+        ethereal: Role | None,
+        officer: Role | None,
+    ):
         await ctx.defer()
 
         roles = RolesService()
         roles.update(neofit=neofit.id) if neofit else ...
         roles.update(adept=adept.id) if adept else ...
         roles.update(master=master.id) if master else ...
+        roles.update(archon=archon.id) if archon else ...
+        roles.update(ethereal=ethereal.id) if ethereal else ...
+        roles.update(officer=officer.id) if officer else ...
 
         await ctx.respond(embed=roles.get_embed("Роли обновлены."), delete_after=settings.DELETE_AFTER, ephemeral=True)
 

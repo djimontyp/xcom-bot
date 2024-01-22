@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     INVITE_TIMEOUT: int = 30  # seconds,
     COOLDOWN_INVITE: int = 60  # seconds
     DELETE_AFTER: int = 30  # seconds for ephemeral messages
+    RATING_DELTA: int = 5
+    RATING_DEFAULT_MOVEMENT: int = 10
 
     class Config:
         extra = "allow"

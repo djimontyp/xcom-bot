@@ -14,6 +14,12 @@ docker build -t 'xcom:latest' .
 docker run -v ${PWD}/src:/xcom/src -v ${PWD}/.env:/xcom/.env -v ${PWD}/requirements.txt:/xcom/requirements.txt xcom:latest
 ```
 
+На Mac / Linux:
+
+```bash
+docker run -v "$(pwd)"/src:/xcom/src -v "$(pwd)"/.env:/xcom/.env -v "$(pwd)"/requirements.txt:/xcom/requirements.txt xcom:latest
+```
+
 ---
 
 # Описание
