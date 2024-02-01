@@ -1,6 +1,6 @@
 from discord.ext.commands import check
 
-from src import database
+from src.core import database
 from src.errors.player import PlayerNotCreatedError
 
 

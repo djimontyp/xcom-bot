@@ -1,20 +1,19 @@
-from typing import Literal
-
 import discord
 from discord import Embed
 
-from src import database
-from src.models import Rank
+import src.core.utils
+from src.core import database
+from src.core.enum import Rank
 
 
 class RolesService:
     not_set = "Не установлена"
 
     def __init__(self):
-        self.roles = database.roles
+        self.roles = src.core.utils.roles_ids__mapper
 
     def get_role(self, ctx, role_name: Rank):
-        return discord.utils.get(ctx.guild.roles, id=self.roles[role_name])
+        return discord.utils.get(src.core.utils.roles_ids__mapper, id=self.roles[role_name])
 
     @property
     def neofit(self):

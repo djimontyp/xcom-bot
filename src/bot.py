@@ -5,7 +5,7 @@ from discord.ext.commands import Bot
 
 from src.cogs.admin import AdminCog
 from src.cogs.player import PlayerCog
-from src.config import settings
+from src.core.config import settings
 
 
 intents = discord.Intents.all()

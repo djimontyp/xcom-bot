@@ -4,14 +4,13 @@ from discord import (
     ApplicationContext,
     SlashCommandGroup,
     Role,
-    TextChannel,
 )
 from discord.ext import tasks
 from discord.ext.commands import Bot
 
-from src import database
-from src.config import settings
-from src.options import RanksAutocomplete
+from src.core import database
+from src.core.config import settings
+from src.components.options import RanksAutocomplete
 from src.services.roles import RolesService
 
 
@@ -46,27 +45,6 @@ class AdminCog(Cog, guild_ids=[settings.GUILD_ID]):
 
         await ctx.respond(embed=roles.get_embed("Роли обновлены."), delete_after=settings.DELETE_AFTER, ephemeral=True)
 
-    @admin.command(description="Установить канал для поиска сессии.")
-    async def set_session_channel(self, ctx: ApplicationContext, channel: TextChannel):
-        await ctx.defer()
-        database.session_channel = channel.id
-        await ctx.respond(
-            f"Канал для поиска сессии установлен на {channel.mention}.",
-            delete_after=settings.DELETE_AFTER,
-            ephemeral=True,
-        )
-
-    @admin.command(description="Показать канал для поиска сессии.")
-    async def session_channel(self, ctx: ApplicationContext):
-        await ctx.defer()
-
-        if channel := ctx.guild.get_channel(database.session_channel):
-            await ctx.respond(
-                f"Канал поиска сессии: {channel.mention}.", delete_after=settings.DELETE_AFTER, ephemeral=True
-            )
-        else:
-            await ctx.respond(f"Канал поиска сессии не найден.", delete_after=settings.DELETE_AFTER, ephemeral=True)
-
     @admin.command(description="Показать установленные роли соответствия для рангов.")
     async def roles(self, ctx: ApplicationContext):
         await ctx.defer()
@@ -82,7 +60,7 @@ class AdminCog(Cog, guild_ids=[settings.GUILD_ID]):
 
         await ctx.delete()
 
-    @tasks.loop(seconds=settings.REFRESH_SESSION_MESSAGES_INTERVAL)
+    @tasks.loop(seconds=settings.REFRESH_TIME)
     async def refresh_session_messages(self):
         """Обновление сообщений с ролями для поиска сессии.
 
@@ -97,7 +75,7 @@ class AdminCog(Cog, guild_ids=[settings.GUILD_ID]):
         for rank, message_id in database.session_messages.items():
             if message_id:
                 try:
-                    if not (channel := self.bot.get_channel(database.session_channel)):
+                    if not (channel := self.bot.get_channel(settings.SESSION_CHANNEL)):
                         continue
                     message = await channel.fetch_message(message_id)
                 except discord.NotFound:

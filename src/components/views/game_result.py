@@ -2,9 +2,9 @@ import discord
 from discord import Interaction
 from discord.ui import Item
 
-from src import database
-from src.models import GameResult
-from src.services.rating import RatingService
+from src.core import database
+from src.core.enum import GameResult
+from src.services.player import PlayerService
 
 
 class ResultsButtons(discord.ui.View):
@@ -43,9 +43,9 @@ class ResultsButtons(discord.ui.View):
         if all(self.result.values()):
             match i_result, v_result:
                 case GameResult.win, GameResult.lose:
-                    RatingService(initiator.id, invited.id).rate()
+                    PlayerService(initiator.id, invited.id).rate()
                 case GameResult.lose, GameResult.win:
-                    RatingService(invited.id, initiator.id).rate()
+                    PlayerService(invited.id, initiator.id).rate()
                 case GameResult.draw, GameResult.draw:
                     ...
                 case _:

@@ -5,14 +5,16 @@ from discord import Cog, ApplicationContext, SlashCommandGroup
 from discord.ext import commands
 from discord.ext.commands import Bot, cooldown
 
-from src import database
-from src.checks import is_user_in_db
-from src.config import settings
+import src.core.utils
+from src.core import database
+from src.core.checks import is_user_in_db
+from src.core.config import settings
 from src.errors.player import NotSetRolesError, PlayerNotCreatedError, PlayerNotInSearchError, PlayerSelfInviteError
-from src.models import Player, Map, Rank
+from src.core.models import Player
+from src.core.enum import Rank, Map
 from src.services.roles import RolesService
-from src.views.confirm import Confirm
-from src.views.game_result import ResultsButtons
+from src.components.views.confirm import Confirm
+from src.components.views.game_result import ResultsButtons
 
 
 class PlayerCog(Cog, guild_ids=[settings.GUILD_ID]):
@@ -62,7 +64,7 @@ class PlayerCog(Cog, guild_ids=[settings.GUILD_ID]):
         await ctx.respond("Поиск остановлен.", embed=player.embed, delete_after=settings.DELETE_AFTER, ephemeral=True)
 
     @player.command(description="Пригласить игрока в сессию.")
-    @cooldown(1, settings.COOLDOWN_INVITE, commands.BucketType.user)
+    @cooldown(1, settings.INVITE_COOLDOWN, commands.BucketType.user)
     @is_user_in_db()
     async def invite(self, ctx: ApplicationContext, player: discord.Member):
         await ctx.defer()
@@ -121,7 +123,7 @@ class PlayerCog(Cog, guild_ids=[settings.GUILD_ID]):
     async def cog_check(self, ctx: ApplicationContext):
         """Проверка на наличие ролей соответствия для всего модуля игроков."""
 
-        if not all(database.roles.values()):
+        if not all(src.core.utils.roles_ids__mapper.values()):
             raise NotSetRolesError()
 
         return True

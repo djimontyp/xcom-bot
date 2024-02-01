@@ -6,24 +6,26 @@
 docker build -t 'xcom:latest' .
 ```
 
-### Запустить контейнер
+### Поднять контейнер
 
 На Windows:
-
 ```bash
-docker run --name x-com-bot -v ${PWD}/src:/xcom/src -v ${PWD}/.env:/xcom/.env -v ${PWD}/requirements.txt:/xcom/requirements.txt xcom:latest
+try { docker rm -f x-com-bot } catch { }; docker run -d --name x-com-bot -v ${PWD}/src:/xcom/src -v ${PWD}/.env:/xcom/.env -v ${PWD}/requirements.txt:/xcom/requirements.txt xcom:latest
 ```
 
 На Mac / Linux:
-
 ```bash
-docker run --name x-com-bot -v "$(pwd)"/src:/xcom/src -v "$(pwd)"/.env:/xcom/.env -v "$(pwd)"/requirements.txt:/xcom/requirements.txt xcom:latest
+docker rm -f xcom-bot && docker run -d --name x-com-bot -v "$(pwd)"/src:/xcom/src -v "$(pwd)"/.env:/xcom/.env -v "$(pwd)"/requirements.txt:/xcom/requirements.txt xcom:latest
 ```
 
 Перезапуск контейнера:
-
 ```bash
 docker restart x-com-bot
+```
+
+Консоль в контейнере:
+```bash
+docker exec -it x-com-bot bash
 ```
 
 ---
@@ -40,8 +42,6 @@ docker restart x-com-bot
 | Начать поиск сессии            | `/player` |         `go`          |                             -                             |    `Player`     | Начинает поиск сессии                                                                     |
 | Установить роли в бота         | `/admin`  |      `set_roles`      | [neofit](#Options), [adept](#Options), [master](#Options) | `Administrator` | Бот запоминает роли которые нужно будет назначать игрокам.                                |
 | Посмотреть роли                | `/admin`  |        `roles`        |                                                           | `Administrator` | Посмотреть роли которые нужно будет назначать игрокам.                                    |
-| Установить канал поиска сессии | `/admin`  | `set_session_channel` |                    [channel](#Options)                    | `Administrator` | Бот запоминает канал в котором будет происходить поиск сессии.                            |
-| Посмотреть канал поиска сессии | `/admin`  |   `session_channel`   |                                                           | `Administrator` | Посмотреть канал в котором будет происходить поиск сессии.                                |
 | Сообщение для поиска сессии    | `/admin`  |   `session_message`   |                     [rank](#Options)                      | `Administrator` | Вызвать сообщение для поиска сессии с авто обновлением для ранга.                         |
 
 ---

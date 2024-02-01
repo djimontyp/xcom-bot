@@ -1,7 +1,7 @@
 from discord import Option
 from discord.utils import basic_autocomplete
 
-from src.models import Rank
+from src.core.enum import Rank
 
 RanksAutocomplete = Option(
     str,
