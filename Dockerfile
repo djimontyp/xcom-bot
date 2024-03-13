@@ -5,7 +5,6 @@ WORKDIR /xcom
 COPY src ./src
 COPY requirements.txt ./
 COPY ".env" ./.env
+COPY alembic.ini ./alembic.ini
 
 RUN pip install -r ./requirements.txt
-
-CMD ["python", "-m", "src.bot"]

@@ -1,11 +1,11 @@
 from datetime import datetime
+from uuid import uuid4
 
 from sqlalchemy import TIMESTAMP
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 
 from src.core.config import settings
-from src.core.models import Player
 from src.core.enum import Rank
 
 engine = create_async_engine(settings.DB_URL)
@@ -22,9 +22,11 @@ class Base(DeclarativeBase):
         return cls.__name__.lower()
 
 
-players: dict[int, Player] = {
-    412350766662156289: Player(id=412350766662156289, in_search=True, rating=100),
-    1128775596781088798: Player(id=1128775596781088798, in_search=True, rating=100),
+session_messages = {
+    Rank.neofit: settings.SEARCH_MESSAGE__NEOFIT,
+    Rank.adept: settings.SEARCH_MESSAGE__ADEPT,
+    Rank.officer: settings.SEARCH_MESSAGE__OFFICER,
+    Rank.master: settings.SEARCH_MESSAGE__MASTER,
+    Rank.archon: settings.SEARCH_MESSAGE__ARCHON,
+    Rank.ethereal: settings.SEARCH_MESSAGE__ETHEREAL,
 }
-
-session_messages = {rank: None for rank in list(Rank)}

@@ -3,21 +3,38 @@ from src.core.enum import Rank
 
 
 def get_rank_by_rating(rating: int) -> Rank | None:
-    if 0 <= rating < 199:
+    if rating < 1200:
         return Rank.neofit
-    elif 200 <= rating < 499:
+    elif 1200 <= rating < 1500:
         return Rank.adept
-    elif 500 <= rating < 999:
+    elif 1500 <= rating < 2000:
         return Rank.officer
-    elif 1000 <= rating < 1499:
+    elif 2000 <= rating < 2500:
         return Rank.master
-    elif 1500 <= rating < 1999:
+    elif 2500 <= rating < 3000:
         return Rank.archon
-    elif 2000 <= rating:
+    elif 3000 <= rating:
         return Rank.ethereal
+    else:
+        return Rank.neofit
 
 
-roles_ids__mapper = {
+def get_rating_min_max_by_rank(rank: Rank):
+    if rank == Rank.neofit:
+        return 0, 1200
+    elif rank == Rank.adept:
+        return 1200, 1500
+    elif rank == Rank.officer:
+        return 1500, 2000
+    elif rank == Rank.master:
+        return 2000, 2500
+    elif rank == Rank.archon:
+        return 2500, 3000
+    elif rank == Rank.ethereal:
+        return 3000, float("inf")
+
+
+roles_ids = {
     Rank.neofit: settings.ROLE_NEOFIT,
     Rank.adept: settings.ROLE_ADEPT,
     Rank.master: settings.ROLE_MASTER,
@@ -25,3 +42,7 @@ roles_ids__mapper = {
     Rank.archon: settings.ROLE_ARCHON,
     Rank.ethereal: settings.ROLE_ETHEREAL,
 }
+
+
+def role_mention(rank: Rank):
+    return f"<@&{roles_ids[rank]}>"

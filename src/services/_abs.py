@@ -28,8 +28,12 @@ class Service(ABC):
     ):
         self.entity_id = entity_id
         self.ctx = ctx
-        self.interaction = interaction if interaction else ctx.interaction
-        self.guild = ctx.guild if ctx else interaction.guild
+        if interaction:
+            self.interaction = interaction
+            self.guild = self.interaction.guild
+        elif ctx:
+            self.interaction = ctx.interaction
+            self.guild = self.ctx.guild
 
     async def __aenter__(self):
         self.session: AsyncSession = async_session_maker()
@@ -48,11 +52,25 @@ class Service(ABC):
         stmt = update(self.model).where(self.criteria).values(**kwargs)
         await self.session.execute(stmt)
 
-    async def get_instance(self, *options, **filters: Mapping[str, Any]) -> Result:
+    async def add(self, instance: Any) -> None:
+        self.instance = instance
+        self.session.add(instance)
+
+    async def get_instance(self, *options, **filters: Mapping[str, Any]) -> Result | None:
         stmt = select(self.model).options(*options).where(self.criteria)
         if filters:
             stmt = stmt.where(**filters)
 
-        self.instance.service = self
         self.instance = await self.session.scalar(stmt)
+        if self.instance:
+            self.instance.service = self
+
         return self.instance
+
+    async def get(self, *options):
+        stmt = select(self.model).where(*options)
+        result = (await self.session.execute(stmt)).scalar()
+        if result:
+            result.service = self
+
+        return result

@@ -15,10 +15,18 @@ class PlayerNotCreatedError(CheckFailure):
         super().__init__(text)
 
 
+class PlayerAlreadyCreatedError(CheckFailure):
+    """Ошибка, если игрок уже создан."""
+
+    def __init__(self, player, text: str = "Игрок уже создан."):
+        self.player = player
+        super().__init__(text)
+
+
 class PlayerNotInSearchError(CheckFailure):
     """Ошибка, если игрок не в поиске игры."""
 
-    def __init__(self, text: str = "Игрок не в поиске игры."):
+    def __init__(self, text: str = "Игрок не в режиме поиска игры."):
         super().__init__(text)
 
 

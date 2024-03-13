@@ -19,6 +19,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
     async def cancel_callback(self, button: discord.ui.Button, interaction: Interaction):
         self.disable_all_items()
+
         await interaction.response.send_message("Отменено", ephemeral=True)
         self.value = False
         self.stop()

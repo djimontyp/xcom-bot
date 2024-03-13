@@ -7,7 +7,7 @@ class Rank(StrEnum):
     officer = "Офицер"
     master = "Мастер"
     archon = "Архонт"
-    ethereal = "Эфирниал"
+    ethereal = "Эфириал"
 
     @classmethod
     def difference(cls, rank1, rank2):

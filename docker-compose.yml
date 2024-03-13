@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: xcom
+    command: python -m src.bot
+    volumes:
+      - ./src:/xcom/src
+      - ./.env:/xcom/.env
+      - ./requirements.txt:/xcom/requirements.txt
+    env_file:
+      - .env
+    networks:
+      - xcom_network
+    depends_on:
+      - db
+
+  db:
+    container_name: xcom_db
+    image: postgres:15-alpine
+    env_file:
+      - .env
+    ports:
+      - "35432:5432"
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    networks:
+      - xcom_network
+
+volumes:
+  db_volume:
+    name: xcom_db_volume
+
+networks:
+  xcom_network:
+    driver: bridge

@@ -1,31 +1,49 @@
+from pydantic import conint
 from pydantic.v1 import BaseSettings
 
 
 class Settings(BaseSettings):
+    # DB
+    DB_URL: str = "postgresql+asyncpg://xcom:xcom@db:5432/xcom"
+    POSTGRES_USER: str = "xcom"
+    POSTGRES_PASSWORD: str = "xcom"
+    POSTGRES_SERVER: str = "xcom"
+
     # Application
-    DB_URL: str = "sqlite+aiosqlite:///database_xcom.sqlite3"
-    REFRESH_TIME: int = 10  # seconds
+    REFRESH_TIME: int = 5  # seconds. время автообновления игроков в поиске.
     INVITE_TIMEOUT: int = 30  # seconds
     INVITE_COOLDOWN: int = 60  # seconds
-    DELETE_AFTER: int = 30  # seconds. ephemeral messages
+    DELETE_AFTER: int = 30  # seconds. ephemeral messages. автоудаление сообщений от бота.
 
     # Discord
     DISCORD_BOT_TOKEN: str
     GUILD_ID: int
 
     # XCOM
-    INITIAL_RATING: int
-    RATING_DELTA: int = 5
-    RATING_DEFAULT_MOVEMENT: int = 10
+    INITIAL_RATING: int = 1000
+    RATING_DELTA: int = 2
+    RATING_DEFAULT_MOVEMENT: int = 12
 
-    ROLE_NEOFIT: int | None = 1195819868247830580
-    ROLE_ADEPT: int | None = 1195819965304012833
-    ROLE_MASTER: int | None = 1195820003514134579
-    ROLE_OFFICER: int | None = None
-    ROLE_ARCHON: int | None = None
-    ROLE_ETHEREAL: int | None = None
+    ROLE_NEOFIT: int
+    ROLE_ADEPT: int
+    ROLE_MASTER: int
+    ROLE_OFFICER: int
+    ROLE_ARCHON: int
+    ROLE_ETHEREAL: int
 
-    SESSION_CHANNEL: int | None = 1196106456974504096
+    SEARCH_MESSAGE__ETHEREAL: int
+    SEARCH_MESSAGE__ARCHON: int
+    SEARCH_MESSAGE__MASTER: int
+    SEARCH_MESSAGE__OFFICER: int
+    SEARCH_MESSAGE__ADEPT: int
+    SEARCH_MESSAGE__NEOFIT: int
+
+    LEADERBOARD_MESSAGE: int
+    LEADERBOARD_COUNT: conint(ge=10, le=30) = 10
+    LEADERBOARD_REFRESH_TIME: int = 3600
+
+    SESSION_CHANNEL: int
+    CATEGORY_FOR_VOICES_ID: int
 
     class Config:
         extra = "allow"

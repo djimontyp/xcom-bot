@@ -2,30 +2,31 @@
 
 ### Собрать образ из Dockerfile
 
+### Поднять проект
 ```bash
-docker build -t 'xcom:latest' .
+docker-compose up -d --remove-orphans  --force-recreate --build
 ```
 
-### Поднять контейнер
 
-На Windows:
+### Создать миграцию с кратким описанием (!!! Не забудьте заменить 'init' на свое описание !!!)
+Нужно после изменения моделей.
 ```bash
-try { docker rm -f x-com-bot } catch { }; docker run -d --name x-com-bot -v ${PWD}/src:/xcom/src -v ${PWD}/.env:/xcom/.env -v ${PWD}/requirements.txt:/xcom/requirements.txt xcom:latest
+docker exec -it xcom bash -c "alembic revision --autogenerate -m 'init'"
 ```
 
-На Mac / Linux:
+Применить миграции:
 ```bash
-docker rm -f xcom-bot && docker run -d --name x-com-bot -v "$(pwd)"/src:/xcom/src -v "$(pwd)"/.env:/xcom/.env -v "$(pwd)"/requirements.txt:/xcom/requirements.txt xcom:latest
+docker exec -it xcom bash -c "alembic upgrade head"
 ```
 
-Перезапуск контейнера:
+Откатить миграции:
 ```bash
-docker restart x-com-bot
+docker exec -it xcom bash -c "alembic downgrade -1"
 ```
 
 Консоль в контейнере:
 ```bash
-docker exec -it x-com-bot bash
+docker-compose -f docker-compose.yml exec -it app bash
 ```
 
 ---
